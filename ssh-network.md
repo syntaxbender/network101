@@ -75,3 +75,10 @@ USE_HMAC                    Y
 # -n remote-server-profile # ur fwknop profile name
 fwknop -n remote-server-profile -R -vv
 ```
+# debug
+```
+// remote-server shell
+sudo journalctl -u fwknop-server
+sudo iptables -L INPUT -v --line-numbers
+
+```
