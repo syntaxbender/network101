@@ -4,12 +4,13 @@
 // remote-server shell
 
 sudo ufw disable
+echo -e "\n# Disable IPv6\nnet.ipv6.conf.all.disable_ipv6 = 1\nnet.ipv6.conf.default.disable_ipv6 = 1\nnet.ipv6.conf.lo.disable_ipv6 = 1" | sudo tee -a /etc/sysctl.conf > /dev/null
 
 # loopback interface fullaccess
 sudo iptables -A INPUT -i lo -j ACCEPT
 
 # if a connection established wont drop. need this for access while blocking ssh port if connection established.
-sudo iptables -A INPUT -m conntrack --cstate ESTABLISHED,RELATED -j ACCEPT
+sudo iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 
 # allow fwknop udp port, http, https
 sudo iptables -A INPUT -p udp --dport 62201 -j ACCEPT 
@@ -19,9 +20,20 @@ sudo iptables -A INPUT -p tcp --dport 443 -j ACCEPT
 # disable ssh port
 sudo iptables -A INPUT -p tcp --dport 22 -j DROP
 
-sudo apt install fwknop-server fwknop-client
+# set ıptable rules persıstant
+sudo iptables-save | sudo tee /etc/iptables/rules.v4
+
+# install fwknop for open ssh to ur ip
+sudo apt install fwknop-server fwknop-client iptables-persistent netfilter-persistent
 sudo nano /etc/fwknop/fwknopd.conf
 
+```
+
+```
+sudo systemctl enable fwknop-server
+sudo systemctl enable ssh
+sudo systemctl enable --now netfilter-persistent
+sudo systemctl reload netfilter-persistent
 ```
 
 ```
@@ -81,4 +93,6 @@ fwknop -n remote-server-profile -R -vv
 sudo journalctl -u fwknop-server
 sudo iptables -L INPUT -v --line-numbers
 
+# for example, delete 4. line verbose output
+sudo iptables -D INPUT 4 
 ```
