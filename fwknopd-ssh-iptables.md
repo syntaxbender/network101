@@ -35,11 +35,6 @@ echo -e "\n# Disable IPv6\nnet.ipv6.conf.all.disable_ipv6 = 1\nnet.ipv6.conf.def
 # accept input rule for ssh connect to your ip
 sudo iptables -I INPUT -p tcp -s <YOUR_EXTERNAL_CLIENT_IP> --dport 22 -j ACCEPT
 
-# set default iptables policy
-sudo iptables -P INPUT DROP
-sudo iptables -P FORWARD DROP
-sudo iptables -P OUTPUT ACCEPT
-
 # loopback interface fullaccess
 sudo iptables -A INPUT -i lo -j ACCEPT
 
@@ -50,6 +45,11 @@ sudo iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 sudo iptables -A INPUT -p udp --dport 62201 -j ACCEPT
 sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT
 sudo iptables -A INPUT -p tcp --dport 443 -j ACCEPT
+
+# set default iptables policy
+sudo iptables -P INPUT DROP
+sudo iptables -P FORWARD DROP
+sudo iptables -P OUTPUT ACCEPT
 
 # delete custom sshport rule for ur ip when ssh connection established
 sudo iptables -D INPUT -p tcp -s <YOUR_EXTERNAL_CLIENT_IP> --dport 22 -j ACCEPT
